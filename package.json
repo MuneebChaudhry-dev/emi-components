@@ -14,8 +14,14 @@
     "@formkit/pro": "^0.121.5",
     "@formkit/vue": "latest",
     "autoprefixer": "latest",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-vue-next": "^0.325.0",
     "postcss": "latest",
+    "radix-vue": "^1.4.3",
+    "tailwind-merge": "^2.2.1",
     "tailwindcss": "latest",
+    "tailwindcss-animate": "^1.0.7",
     "vue": "^3.4.15"
   },
   "devDependencies": {
