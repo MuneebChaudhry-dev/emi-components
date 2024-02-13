@@ -167,45 +167,62 @@ const tabsClasses =
           </div>
         </div>
 
-        <!-- Adpprove High Value Transactions -->
-        <div class="flex w-full items-center gap-4 mb-4">
-          <FormKit
-            type="checkbox"
-            label="Approve High-Value Transactions"
-            name="high_value_transactions"
-            decorator-icon="check"
-            :classes="{
-              outer:
-                '$reset formkit-outer  formkit-disabled:opacity-50 w-fit mb-0',
-              decorator:
-                '$reset formkit-decorator block relative  h-5 w-5 mr-2 bg-white ring-2 ring-black peer-checked:ring-[#FFCF25] peer-checked:bg-[#FFCF25] text-transparent peer-checked:text-white',
-            }"
-          />
-          <span
-            @mouseover="highValueTransactionsTooltip = true"
-            @mouseleave="highValueTransactionsTooltip = false"
-          >
-            <FormKitIcon
-              icon="info"
-              class="font-extrabold [&>svg]:w-[1em] [&>svg]:h-[1em]"
+        <!-- Approve High Value Transactions -->
+        <div>
+          <div class="flex w-full items-center gap-4 mb-4">
+            <FormKit
+              type="checkbox"
+              label="Approve High-Value Transactions"
+              name="is_high_value_transactions"
+              decorator-icon="check"
+              :classes="{
+                outer:
+                  '$reset formkit-outer  formkit-disabled:opacity-50 w-fit mb-0',
+                decorator:
+                  '$reset formkit-decorator block relative  h-5 w-5 mr-2 bg-white ring-2 ring-black peer-checked:ring-[#FFCF25] peer-checked:bg-[#FFCF25] text-transparent peer-checked:text-white',
+              }"
+              v-model="is_high_value_transactions"
             />
-          </span>
-          <div
-            v-if="highValueTransactionsTooltip"
-            class="absolute left-96 transition duration-700 ease-in-out"
-          >
-            <BaseTooltip
-              placement="left"
-              class="bg-[#FFF8F0] border-1 border-[#CFC6B4]"
+            <span
+              @mouseover="highValueTransactionsTooltip = true"
+              @mouseleave="highValueTransactionsTooltip = false"
             >
-              <template #text
-                >Requiring parental approval for transactions above a certain
-                amount.</template
+              <FormKitIcon
+                icon="info"
+                class="font-extrabold [&>svg]:w-[1em] [&>svg]:h-[1em]"
+              />
+            </span>
+            <div
+              v-if="highValueTransactionsTooltip"
+              class="absolute left-96 transition duration-700 ease-in-out"
+            >
+              <BaseTooltip
+                placement="left"
+                class="bg-[#FFF8F0] border-1 border-[#CFC6B4]"
               >
-            </BaseTooltip>
+                <template #text
+                  >Requiring parental approval for transactions above a certain
+                  amount.</template
+                >
+              </BaseTooltip>
+            </div>
+          </div>
+          <div v-if="is_high_value_transactions">
+            <FormKit
+              type="text"
+              name="high_value_transactions"
+              :suffix-icon="euroPlaceHolderSVG"
+              :classes="{
+                suffixIcon:
+                  ' $reset formkit-suffix-icon w-max pr-3 flex self-stretch grow-0 shrink-0 [&>svg]:w-full  [&>svg]:max-h-[1em] [&>svg]:m-auto formkit-icon',
+                label:
+                  '$reset formkit-label block mb-1 text-[#374151] font-normal text-sm	',
+              }"
+              validation="number"
+              validation-visibility="live"
+            />
           </div>
         </div>
-
         <!-- Restrict Certain transaction types -->
         <div class="flex w-full items-center gap-4 mb-4">
           <FormKit
@@ -244,7 +261,7 @@ const tabsClasses =
             </BaseTooltip>
           </div>
         </div>
-
+        <div class="search_tag"></div>
         <pre wrap>{{ value }}</pre>
       </FormKit>
     </div>
