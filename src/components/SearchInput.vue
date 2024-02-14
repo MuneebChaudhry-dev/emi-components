@@ -87,6 +87,8 @@ const removeTag = (index) => {
           v-for="(item, index) in filteredItems"
           :key="index"
           @click="selectItem(item)"
+          @mouseenter="highlightedIndex = index"
+          :class="{ 'bg-gray-200': index === highlightedIndex }"
           class="cursor-pointer py-2 px-4 hover:bg-slate-100 flex justify-between"
         >
           {{ item }}
