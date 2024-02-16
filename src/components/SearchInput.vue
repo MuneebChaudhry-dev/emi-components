@@ -1,24 +1,27 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { defineProps } from 'vue';
 
+const props = defineProps({
+  tags: Array,
+});
 const searchTerm = ref('');
-const items = ref(['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California']);
 const selectedTags = ref([]);
 const showDropdown = ref(false);
-const props = defineProps(['tags']);
 const listRef = ref(null);
+const highlightedIndex = ref(-1);
 
-const filteredItems = computed(() => {
-  return items.value.filter((item) =>
-    item.toLowerCase().includes(searchTerm.value.toLowerCase())
+const filteredTags = computed(() => {
+  return props.tags.filter((tag) =>
+    tag.toLowerCase().includes(searchTerm.value.toLowerCase())
   );
 });
 
-const filterItems = () => {
+const filterTags = () => {
   showDropdown.value = true;
 };
 
-const selectItem = (item) => {
+const selectTag = (item) => {
   if (!isTagAlreadyAdded(item)) {
     selectedTags.value.push(item);
   }
@@ -26,10 +29,10 @@ const selectItem = (item) => {
   showDropdown.value = false;
 };
 
-const addTag = () => {
-  if (filteredItems.value.length > 0) {
-    if (!isTagAlreadyAdded(filteredItems.value[0])) {
-      selectedTags.value.push(filteredItems.value[0]);
+const addTag = (index) => {
+  if (filteredTags.value.length > 0) {
+    if (!isTagAlreadyAdded(filteredTags.value[index])) {
+      selectedTags.value.push(filteredTags.value[index]);
     }
     searchTerm.value = '';
     showDropdown.value = false;
@@ -44,6 +47,18 @@ const isTagAlreadyAdded = (item) => {
 
 const removeTag = (index) => {
   selectedTags.value.splice(index, 1);
+};
+const tagListKeyPress = (event) => {
+  if (event.key === 'ArrowUp') {
+    highlightedIndex.value =
+      (highlightedIndex.value - 1 + filteredTags.value.length) %
+      filteredTags.value.length;
+  } else if (event.key === 'ArrowDown' || event.key === 'Tab') {
+    highlightedIndex.value =
+      (highlightedIndex.value + 1) % filteredTags.value.length;
+  } else if (event.key === 'Enter' && highlightedIndex.value !== -1) {
+    addTag(highlightedIndex.value);
+  }
 };
 </script>
 <template>
@@ -69,8 +84,9 @@ const removeTag = (index) => {
       </span>
       <input
         v-model="searchTerm"
-        @input="filterItems"
-        @keydown.enter.prevent="addTag"
+        @input="filterTags"
+        @keydown.enter.prevent=""
+        @keydown="tagListKeyPress"
         class="appearance-none bg-transparent focus:outline-none focus:ring-0 focus:shadow-none w-full px-3 py-2 border-none text-base text-gray-700 placeholder-gray-400"
         type="text"
         placeholder="Search Keywords here..."
@@ -84,15 +100,15 @@ const removeTag = (index) => {
         ref="listRef"
       >
         <li
-          v-for="(item, index) in filteredItems"
+          v-for="(tag, index) in filteredTags"
           :key="index"
-          @click="selectItem(item)"
+          @click="selectTag(tag)"
           @mouseenter="highlightedIndex = index"
-          :class="{ 'bg-gray-200': index === highlightedIndex }"
+          :class="{ 'bg-slate-100': index === highlightedIndex }"
           class="cursor-pointer py-2 px-4 hover:bg-slate-100 flex justify-between"
         >
-          {{ item }}
-          <span v-if="isTagAlreadyAdded(item)">
+          {{ tag }}
+          <span v-if="isTagAlreadyAdded(tag)">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14"
