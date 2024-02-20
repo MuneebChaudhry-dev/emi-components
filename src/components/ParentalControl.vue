@@ -23,7 +23,6 @@ const spendingLimitTypes = ['daily', 'weekly', 'monthly'];
 
 const getTags = (tags) => {
   parentalFormData.value.selected_tags = tags;
-  console.log('tags', tags);
 };
 
 const parentalFormData = ref({
