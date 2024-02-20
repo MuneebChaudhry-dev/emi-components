@@ -19,15 +19,23 @@ const checkedSVG =
 const tabsClasses =
   'data-[state=active]:bg-[#EFF0F2] font-normal text-[#B6B6B6] data-[state=active]:text-[#5B5B5B] py-[0.51rem] border data-[state=active]:border-[#ADADAD]';
 
+const spendingLimitTypes = ['daily', 'weekly', 'monthly'];
+
+const getTags = (tags) => {
+  parentalFormData.value.selected_tags = tags;
+  console.log('tags', tags);
+};
+
 const parentalFormData = ref({
   selected_minor: '',
   transfer_limit: '',
-  spending_limits: '',
-  lock_card: '',
+  is_spending_limits: '',
+  limit_type: '',
+  is_lock_card: '',
   is_high_value_transactions: '',
   high_value_transactions: '',
-  restrict_transactions_types: '',
-  limit_type: '',
+  is_restrict_transactions_types: '',
+  selected_tags: '',
 });
 </script>
 
@@ -57,7 +65,7 @@ const parentalFormData = ref({
           }"
           :options="['Minor1', 'Minor2', 'Minor3']"
         />
-        <div v-if="!parentalFormData.spending_limits">
+        <div v-if="!parentalFormData.is_spending_limits">
           <FormKit
             type="text"
             label="Daily Transfer Limit (Optional)"
@@ -79,7 +87,7 @@ const parentalFormData = ref({
           <FormKit
             type="checkbox"
             label="Set Spending Limits"
-            name="spending_limits"
+            name="is_spending_limits"
             decorator-icon="check"
             :classes="{
               outer:
@@ -87,7 +95,7 @@ const parentalFormData = ref({
               decorator:
                 '$reset formkit-decorator block relative   h-5 w-5 mr-2 bg-white ring-2 ring-black peer-checked:ring-[#FFCF25] peer-checked:bg-[#FFCF25] text-transparent peer-checked:text-white',
             }"
-            v-model="spending_limits"
+            v-model="is_spending_limits"
           />
           <span
             @mouseover="spendingLimitsTooltip = true"
@@ -113,18 +121,21 @@ const parentalFormData = ref({
             </BaseTooltip>
           </div>
         </div>
-        <div class="flex gap-4" v-if="parentalFormData.spending_limits">
+        <div class="flex gap-4" v-if="parentalFormData.is_spending_limits">
           <Tabs default-value="weekly" class="w-auto">
             <TabsList class="bg-white border-2 p-0 border-[#E3E3E3]">
-              <TabsTrigger value="daily" :class="tabsClasses">
-                Daily
-              </TabsTrigger>
-              <TabsTrigger value="weekly" :class="tabsClasses">
-                Weekly
-              </TabsTrigger>
-              <TabsTrigger value="monthly" :class="tabsClasses">
-                Monthly
-              </TabsTrigger>
+              <template
+                v-for="limitType in spendingLimitTypes"
+                :key="limitType"
+              >
+                <TabsTrigger
+                  :value="limitType"
+                  :class="tabsClasses"
+                  @click="parentalFormData.limit_type = limitType"
+                >
+                  {{ limitType.charAt(0).toUpperCase() + limitType.slice(1) }}
+                </TabsTrigger>
+              </template>
             </TabsList>
           </Tabs>
 
@@ -149,7 +160,7 @@ const parentalFormData = ref({
           <FormKit
             type="checkbox"
             label="Lock / Unlock Card"
-            name="lock_card"
+            name="is_lock_card"
             decorator-icon="check"
             :classes="{
               outer:
@@ -245,7 +256,7 @@ const parentalFormData = ref({
             <FormKit
               type="checkbox"
               label="Restrict Certain Transaction Types"
-              name="restrict_transactions_types"
+              name="is_restrict_transactions_types"
               decorator-icon="check"
               :classes="{
                 outer:
@@ -253,6 +264,7 @@ const parentalFormData = ref({
                 decorator:
                   '$reset formkit-decorator block relative  h-5 w-5 mr-2 bg-white ring-2 ring-black peer-checked:ring-[#FFCF25] peer-checked:bg-[#FFCF25] text-transparent peer-checked:text-white',
               }"
+              v-model="is_restrict_transactions_types"
             />
             <span
               @mouseover="restrictTransactionsTypesTooltip = true"
@@ -279,8 +291,8 @@ const parentalFormData = ref({
               </BaseTooltip>
             </div>
           </div>
-          <div class="search_tag">
-            <SearchInput :tags="tags" />
+          <div v-if="is_restrict_transactions_types">
+            <SearchInput :tags="tags" @getSelectedTags="getTags" />
           </div>
         </div>
         <pre>{{ parentalFormData }}</pre>

@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { defineProps } from 'vue';
 
 const props = defineProps({
   tags: Array,
 });
+const emit = defineEmits(['getSelectedTags']);
 const searchTerm = ref('');
 const selectedTags = ref([]);
 const showDropdown = ref(false);
@@ -21,18 +22,11 @@ const filterTags = () => {
   showDropdown.value = true;
 };
 
-const selectTag = (item) => {
-  if (!isTagAlreadyAdded(item)) {
-    selectedTags.value.push(item);
-  }
-  searchTerm.value = '';
-  showDropdown.value = false;
-};
-
 const addTag = (index) => {
   if (filteredTags.value.length > 0) {
     if (!isTagAlreadyAdded(filteredTags.value[index])) {
       selectedTags.value.push(filteredTags.value[index]);
+      emit('getSelectedTags', selectedTags.value);
     }
     searchTerm.value = '';
     showDropdown.value = false;
@@ -60,7 +54,29 @@ const tagListKeyPress = (event) => {
     addTag(highlightedIndex.value);
   }
 };
+
+const closeDropdown = (event) => {
+  if (!event.target.closest('.relative')) {
+    showDropdown.value = false;
+  }
+};
+
+watch(
+  () => showDropdown.value,
+  (newVal) => {
+    console.log('Dropdown', newVal);
+  }
+);
+
+onMounted(() => {
+  document.addEventListener('click', closeDropdown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdown);
+});
 </script>
+
 <template>
   <div class="relative">
     <div
@@ -87,6 +103,7 @@ const tagListKeyPress = (event) => {
         @input="filterTags"
         @keydown.enter.prevent=""
         @keydown="tagListKeyPress"
+        @keydown.tab.prevent=""
         class="appearance-none bg-transparent focus:outline-none focus:ring-0 focus:shadow-none w-full px-3 py-2 border-none text-base text-gray-700 placeholder-gray-400"
         type="text"
         placeholder="Search Keywords here..."
@@ -102,7 +119,7 @@ const tagListKeyPress = (event) => {
         <li
           v-for="(tag, index) in filteredTags"
           :key="index"
-          @click="selectTag(tag)"
+          @click="addTag(index)"
           @mouseenter="highlightedIndex = index"
           :class="{ 'bg-slate-100': index === highlightedIndex }"
           class="cursor-pointer py-2 px-4 hover:bg-slate-100 flex justify-between"
